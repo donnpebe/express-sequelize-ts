@@ -1,5 +1,5 @@
 export const projectassignments = (projectIds: string[], userIds: string[]) => {
-  let assignments: Array<{ projectId: string; userId: string }> = [
+  const assignments: Array<{ projectId: string; userId: string }> = [
     {
       projectId: projectIds[0],
       userId: userIds[0],

@@ -1,23 +1,27 @@
-import express from 'express';
-import db from './models';
+import dotenv from 'dotenv';
+dotenv.config();
+
+import { User, Project, ProjectAssignment } from './models';
 import { users } from './seeders/users';
 import { projects } from './seeders/projects';
 import { projectassignments } from './seeders/projectassignments';
 
 const seedUsers = async () => {
   const promises = users.map(async user => {
-    await db.User.create(user);
+    await User.create(user);
   });
 
   await Promise.all(promises);
+  console.log('users');
 };
 
 const seedProjects = async () => {
   const promises = projects.map(async project => {
-    await db.Project.create(project);
+    await Project.create(project);
   });
 
   await Promise.all(promises);
+  console.log('projects');
 };
 
 const seedProjectAssignments = async () => {
@@ -26,25 +30,20 @@ const seedProjectAssignments = async () => {
     users.map(u => u.id)
   );
   const promises = assigns.map(async asg => {
-    await db.ProjectAssignment.create(asg);
+    await ProjectAssignment.create(asg);
   });
 
   await Promise.all(promises);
+
+  console.log('projectsass');
 };
 
-const app = express();
-const port = process.env.PORT || 3001;
+const runSeeder = async () => {
+  await seedUsers();
+  await seedProjects();
+  await seedProjectAssignments();
+};
 
-db.sequelize.sync({ force: true }).then(async () => {
-  try {
-    await seedUsers();
-    await seedProjects();
-    await seedProjectAssignments();
-  } catch (err) {
-    console.log(err);
-    console.log('seed already applied');
-  }
-  app.listen(port, () => {
-    console.log(`App listerning on port ${port}`);
-  });
-});
+if (require.main === module) {
+  runSeeder().catch(e => console.error('An error occured when running the seeder tasks: ', e));
+}
