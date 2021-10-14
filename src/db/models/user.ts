@@ -1,62 +1,70 @@
-import { Model, Optional, DataTypes } from 'sequelize';
+import {
+  Column,
+  DataType,
+  Table,
+  Model,
+  IsUUID,
+  PrimaryKey,
+  CreatedAt,
+  UpdatedAt,
+  IsEmail,
+  BelongsToMany,
+} from 'sequelize-typescript';
+import { v4 as uuidv4 } from 'uuid';
+import { Project } from './project';
+import { ProjectAssignment } from './project-assignment';
 
-import connection from '..';
-
-interface UserAttributes {
+@Table({
+  timestamps: true,
+  modelName: 'User',
+  tableName: 'Users',
+})
+export class User extends Model {
+  @IsUUID(4)
+  @PrimaryKey
+  @Column({
+    type: DataType.UUID,
+    defaultValue: () => {
+      return uuidv4();
+    },
+    allowNull: false,
+  })
   id: string;
-  name: string;
+
+  @IsEmail
+  @Column({
+    type: DataType.STRING,
+    allowNull: false,
+    unique: true,
+  })
   email: string;
+
+  @Column({
+    type: DataType.STRING,
+    allowNull: false,
+  })
+  name: string;
+
+  @Column({
+    type: DataType.STRING,
+    allowNull: false,
+  })
   password: string;
+
+  @Column({
+    type: DataType.STRING,
+    allowNull: false,
+  })
   salt: string;
-  createdAt?: Date;
-  updatedAt?: Date;
+
+  @BelongsToMany(() => Project, () => ProjectAssignment)
+  projects: Array<Project & { ProjectAssignment: ProjectAssignment }>;
+
+  @Column
+  @CreatedAt
+  createdAt: Date;
+
+  @Column
+  @UpdatedAt
+  updatedAt: Date;
 }
-
-type UserOptionalAttibutes = 'id' | 'createdAt' | 'updatedAt';
-
-export default class User
-  extends Model<UserAttributes, Optional<UserAttributes, UserOptionalAttibutes>>
-  implements UserAttributes
-{
-  id!: string;
-  name!: string;
-  email!: string;
-  password!: string;
-  salt!: string;
-
-  createdAt!: Date;
-  updatedAt!: Date;
-}
-
-User.init(
-  {
-    id: {
-      type: DataTypes.UUID,
-      defaultValue: DataTypes.UUIDV4,
-      allowNull: false,
-      primaryKey: true,
-    },
-    name: {
-      type: DataTypes.STRING,
-      allowNull: false,
-    },
-    email: {
-      type: DataTypes.STRING,
-      allowNull: false,
-      unique: true,
-    },
-    password: {
-      type: DataTypes.STRING,
-      allowNull: false,
-    },
-    salt: {
-      type: DataTypes.STRING,
-      allowNull: false,
-    },
-  },
-  {
-    timestamps: true,
-    sequelize: connection,
-    modelName: 'User',
-  }
-);

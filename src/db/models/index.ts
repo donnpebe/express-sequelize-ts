@@ -1,5 +1,3 @@
-import Project from './project';
-import ProjectAssignment from './projectassignment';
-import User from './user';
-
-export { Project, ProjectAssignment, User };
+export { Project } from './project';
+export { ProjectAssignment } from './project-assignment';
+export { User } from './user';

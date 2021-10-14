@@ -1,19 +1,17 @@
 import { inject, injectable } from 'tsyringe';
 import jwt from 'jsonwebtoken';
+
+import { Config } from '../config/config';
 import { IUserRepo } from '../db/interfaces/user.repo.interface';
 import { SignInDto, SignUpDto } from '../domain/auth/auth.dto';
 import { UserDomain } from '../domain/user/user.domain';
 import { UnauthorizedError } from '../errors/unauthorized-error';
-import { Password } from '../utils/password';
-import { ConfigService } from './config.service';
 import { BadRequestError } from '../errors/bad-request-error';
+import { Password } from '../utils/password';
 
 @injectable()
 export class AuthService {
-  constructor(
-    @inject('IUserRepo') private userRepo: IUserRepo,
-    private configService: ConfigService
-  ) {}
+  constructor(@inject('IUserRepo') private userRepo: IUserRepo, private config: Config) {}
 
   async signIn(dto: SignInDto): Promise<{ accessToken: string; user: UserDomain }> {
     const user = await this.userRepo.findByEmail(dto.email);
@@ -31,7 +29,7 @@ export class AuthService {
         id: user.id,
         email: user.email,
       },
-      this.configService.jwtKey,
+      this.config.jwtKey,
       {
         subject: user.id,
       }

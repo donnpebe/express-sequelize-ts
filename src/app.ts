@@ -6,14 +6,18 @@ import express, { Request, Response } from 'express';
 import 'express-async-errors';
 import cors from 'cors';
 import requestIp from 'request-ip';
-
-import { logger } from './middlewares/morgan';
-import { routes as authRoutes } from './routes/auth.routes';
-import { register as registerDbInjector } from './db/db.injector';
 import { container } from 'tsyringe';
+
+import { Config } from './config/config';
+import { logger } from './middlewares/morgan';
 import { errorHandler } from './middlewares/error-handler';
+import { routes as authRoutes } from './routes/auth.routes';
+import { Database } from './db/database';
+import { register as registerDbInjector } from './db/db.injector';
+import { Project, ProjectAssignment, User } from './db/models';
 
 registerDbInjector(container);
+Database.init(container.resolve(Config), [User, Project, ProjectAssignment]);
 
 const app = express();
 
